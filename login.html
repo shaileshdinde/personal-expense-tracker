@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | Expense Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/adminlte/css/adminlte.min.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+  <div class="login-logo">
+    <b><i class="fas fa-wallet mr-1"></i>Expense</b>Tracker
+  </div>
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">Sign in to track your expenses</p>
+
+      <div id="alert-box" class="alert alert-danger d-none" role="alert"></div>
+
+      <form id="login-form">
+        <div class="input-group mb-3">
+          <input type="email" id="email" class="form-control" placeholder="Email" required>
+          <div class="input-group-append">
+            <div class="input-group-text"><span class="fas fa-envelope"></span></div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="password" id="password" class="form-control" placeholder="Password" required>
+          <div class="input-group-append">
+            <div class="input-group-text"><span class="fas fa-lock"></span></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-7">
+            <div class="icheck-primary">
+              <input type="checkbox" id="device_mobile">
+              <label for="device_mobile">
+                Keep me signed in <span class="text-muted">(30 days)</span>
+              </label>
+            </div>
+          </div>
+          <div class="col-5">
+            <button type="submit" class="btn btn-primary btn-block" id="login-btn">
+              <span class="btn-text">Sign In</span>
+              <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <p class="mb-1 mt-3">
+        <a href="forgot-password.html">I forgot my password</a>
+      </p>
+      <p class="mb-0">
+        <a href="register.html" class="text-center">Register a new account</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="assets/vendor/jquery/jquery.min.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/adminlte/js/adminlte.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/api.js"></script>
+<script>
+$(function () {
+  Auth.redirectIfLoggedIn();
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('expired') === '1') {
+    $('#alert-box').removeClass('d-none').text('Your session has expired. Please sign in again.');
+  }
+  if (params.get('reset') === '1') {
+    $('#alert-box').removeClass('d-none alert-danger').addClass('alert-success')
+      .text('Password reset successfully. Please sign in with your new password.');
+  }
+
+  $('#login-form').on('submit', function (e) {
+    e.preventDefault();
+
+    const email = $('#email').val().trim();
+    const password = $('#password').val();
+    const device = $('#device_mobile').is(':checked') ? 'mobile' : 'web';
+
+    const $btn = $('#login-btn');
+    $btn.prop('disabled', true);
+    $btn.find('.btn-text').addClass('d-none');
+    $btn.find('.spinner-border').removeClass('d-none');
+
+    Api.post('/api/login', { email: email, password: password, device: device })
+      .done(function (resp) {
+        Auth.saveSession(resp.data.auth, resp.data.user);
+        window.location.href = 'index.html';
+      })
+      .fail(function (resp) {
+        $('#alert-box').removeClass('d-none alert-success').addClass('alert-danger')
+          .text(UI.apiErrorMessage(resp));
+      })
+      .always(function () {
+        $btn.prop('disabled', false);
+        $btn.find('.btn-text').removeClass('d-none');
+        $btn.find('.spinner-border').addClass('d-none');
+      });
+  });
+});
+</script>
+</body>
+</html>

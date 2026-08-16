@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | Expense Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/adminlte/css/adminlte.min.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <div id="navbar-placeholder"></div>
+  <div id="sidebar-placeholder"></div>
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2 align-items-center">
+          <div class="col-sm-6">
+            <h1 class="m-0">Dashboard</h1>
+          </div>
+          <div class="col-sm-6 text-sm-right">
+            <span class="text-muted">Welcome back, <strong id="welcome-name">there</strong> 👋</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+
+        <!-- Summary cards -->
+        <div class="row">
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3 id="stat-today">₹0.00</h3>
+                <p>Spent Today</p>
+              </div>
+              <div class="icon"><i class="fas fa-calendar-day"></i></div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3 id="stat-month">₹0.00</h3>
+                <p>This Month</p>
+              </div>
+              <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3 id="stat-count">0</h3>
+                <p>Expenses (Active)</p>
+              </div>
+              <div class="icon"><i class="fas fa-receipt"></i></div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger">
+              <div class="inner">
+                <h3 id="stat-categories">0</h3>
+                <p>Active Categories</p>
+              </div>
+              <div class="icon"><i class="fas fa-tags"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-hand-holding-usd mr-1"></i> Loans Given</h3>
+                <div class="card-tools">
+                  <a href="loans.html" class="btn btn-sm btn-primary">Manage Loans</a>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row text-center">
+                  <div class="col-6 col-md-4">
+                    <div class="text-muted small">Total Lent</div>
+                    <div class="h4" id="loan-stat-lent">₹0.00</div>
+                  </div>
+                  <div class="col-6 col-md-4 mt-3 mt-md-0">
+                    <div class="text-muted small">Outstanding</div>
+                    <div class="h4 text-danger" id="loan-stat-outstanding">₹0.00</div>
+                  </div>
+                  <div class="col-12 col-md-4 mt-3 mt-md-0">
+                    <div class="text-muted small">Active Loans</div>
+                    <div class="h4 text-warning" id="loan-stat-active">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Donut chart: spend by category (current month) -->
+          <div class="col-md-5">
+            <div class="card chart-card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> This Month by Category</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container"><canvas id="donutChart"></canvas></div>
+                <div id="donut-empty" class="empty-state d-none">
+                  <i class="fas fa-inbox"></i>
+                  <p class="mb-0">No expenses recorded this month yet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bar chart: last 6 months trend -->
+          <div class="col-md-7">
+            <div class="card chart-card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> Last 6 Months Trend</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container"><canvas id="trendChart"></canvas></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-history mr-1"></i> Recent Expenses</h3>
+                <div class="card-tools">
+                  <a href="expenses.html" class="btn btn-sm btn-primary">View All</a>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Reason</th>
+                      <th>Category</th>
+                      <th>Payment</th>
+                      <th class="text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-expenses-body">
+                    <tr><td colspan="5" class="text-center py-4 text-muted">Loading...</td></tr>
+                  </tbody>
+                </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <div id="footer-placeholder"></div>
+</div>
+
+<script src="assets/vendor/jquery/jquery.min.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/adminlte/js/adminlte.min.js"></script>
+<script src="assets/vendor/chartjs/chart.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/dashboard.js"></script>
+</body>
+</html>

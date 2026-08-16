@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reports | Expense Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/adminlte/css/adminlte.min.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <div id="navbar-placeholder"></div>
+  <div id="sidebar-placeholder"></div>
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <h1 class="m-0">Reports</h1>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+
+        <!-- Date range filter (drives category / sub-category / date-range charts) -->
+        <div class="card">
+          <div class="card-body">
+            <form id="range-form" class="form-row align-items-end">
+              <div class="col-6 col-md-3 mb-2">
+                <label class="small mb-1 text-muted">From</label>
+                <input type="date" class="form-control form-control-sm" id="range-from">
+              </div>
+              <div class="col-6 col-md-3 mb-2">
+                <label class="small mb-1 text-muted">To</label>
+                <input type="date" class="form-control form-control-sm" id="range-to">
+              </div>
+              <div class="col-12 col-md-3 mb-2">
+                <button type="submit" class="btn btn-primary btn-sm btn-block">
+                  <i class="fas fa-filter mr-1"></i>
+                  <span class="d-none d-md-inline">Apply to Category / Sub-Category / Trend</span>
+                  <span class="d-md-none">Apply Filter</span>
+                </button>
+              </div>
+              <div class="col-12 col-md-3 mb-2 text-md-right">
+                <div class="quick-range-group">
+                  <button type="button" class="btn btn-outline-secondary btn-sm" data-range="7">Last 7 days</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" data-range="30">Last 30 days</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" data-range="month">This month</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Donut: by category -->
+          <div class="col-lg-5">
+            <div class="card chart-card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> By Category</h3>
+                <div class="card-tools">
+                  <span class="badge badge-light border" id="category-total-badge">₹0.00</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container chart-tall"><canvas id="categoryDonutChart"></canvas></div>
+                <div id="category-empty" class="empty-state d-none">
+                  <i class="fas fa-inbox"></i><p class="mb-0">No data for this date range.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Horizontal bar: by subcategory -->
+          <div class="col-lg-7">
+            <div class="card chart-card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> By Sub-Category</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container chart-tall"><canvas id="subcategoryBarChart"></canvas></div>
+                <div id="subcategory-empty" class="empty-state d-none">
+                  <i class="fas fa-inbox"></i><p class="mb-0">No data for this date range.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Line: daily trend for the date range -->
+          <div class="col-lg-12">
+            <div class="card chart-card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-line mr-1"></i> Daily Trend</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container"><canvas id="dailyLineChart"></canvas></div>
+                <div id="daily-empty" class="empty-state d-none">
+                  <i class="fas fa-inbox"></i><p class="mb-0">No data for this date range.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly report (separate year-based filter) -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-calendar mr-1"></i> Monthly Report</h3>
+            <div class="card-tools">
+              <select class="form-control form-control-sm d-inline-block w-auto" id="monthly-year"></select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container"><canvas id="monthlyBarChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Detail table -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-table mr-1"></i> Category Breakdown (selected range)</h3>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th class="text-right">Expenses</th>
+                  <th class="text-right">Total Amount</th>
+                  <th class="text-right">% of Total</th>
+                </tr>
+              </thead>
+              <tbody id="category-table-body">
+                <tr><td colspan="4" class="text-center py-4 text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <div id="footer-placeholder"></div>
+</div>
+
+<script src="assets/vendor/jquery/jquery.min.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/adminlte/js/adminlte.min.js"></script>
+<script src="assets/vendor/chartjs/chart.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/reports.js"></script>
+</body>
+</html>

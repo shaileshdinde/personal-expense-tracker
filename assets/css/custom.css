@@ -1,0 +1,291 @@
+/* ==========================================================================
+   Custom styles - written mobile-first.
+   Base rules target small screens; min-width media queries layer on
+   desktop refinements. AdminLTE/Bootstrap are already responsive at the
+   grid level - these rules fix the specific things that don't adapt well
+   on their own (fixed-width boxes, dense tables, oversized touch targets).
+   ========================================================================== */
+
+.badge-purple { background-color: #6f42c1; color: #fff; }
+.badge-teal { background-color: #20c997; color: #fff; }
+
+.required-asterisk { color: #e74a3b; }
+
+.empty-state {
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: #858796;
+}
+.empty-state i {
+  font-size: 2.25rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------
+   Auth pages (login / register / forgot / reset)
+   AdminLTE hardcodes .login-box/.register-box to 360px, which overflows
+   on phones narrower than ~380px. Mobile-first: full-width with gutters
+   by default, fixed width once there's room for it.
+   -------------------------------------------------------------------- */
+.login-page,
+.register-page {
+  background: linear-gradient(135deg, #4e73df 0%, #1cc88a 100%);
+}
+
+.login-box,
+.register-box {
+  width: 100%;
+  max-width: 360px;
+  padding: 0 12px;
+  margin: 6% auto;
+}
+
+.login-box .card,
+.register-box .card {
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
+}
+
+.login-logo b,
+.register-logo b {
+  color: #fff;
+}
+
+@media (max-width: 360px) {
+  .login-logo,
+  .register-logo {
+    font-size: 1.6rem;
+  }
+  .login-card-body,
+  .register-card-body {
+    padding: 1.25rem;
+  }
+}
+
+/* --------------------------------------------------------------------
+   Page header: title + primary action button.
+   Mobile-first: action button is full-width and sits below the title so
+   it's an easy thumb target. From the sm breakpoint up it shrinks back
+   to an inline, right-aligned button.
+   -------------------------------------------------------------------- */
+.btn-page-action {
+  width: 100%;
+}
+@media (min-width: 576px) {
+  .btn-page-action {
+    width: auto;
+  }
+}
+
+/* --------------------------------------------------------------------
+   Tables: always horizontally scrollable on narrow screens instead of
+   squeezing columns or breaking the layout. Pair with the
+   .table-responsive wrapper added around every <table>.
+   -------------------------------------------------------------------- */
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+}
+.table-actions .btn {
+  padding: 0.3rem 0.55rem;
+}
+.table-actions .btn + .btn {
+  margin-left: 0.25rem;
+}
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+/* Keep the most important columns from wrapping awkwardly on small widths */
+@media (max-width: 575.98px) {
+  .table td,
+  .table th {
+    white-space: nowrap;
+  }
+  .table td.wrap,
+  .table th.wrap {
+    white-space: normal;
+  }
+}
+
+/* --------------------------------------------------------------------
+   Filter bars: two columns on phones instead of a long single-column
+   stack, full grid from md up. Apply `.filter-col` alongside the
+   existing col-md-* class on filter fields.
+   -------------------------------------------------------------------- */
+.filter-col {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+@media (min-width: 768px) {
+  .filter-col {
+    flex: 0 0 auto;
+    max-width: none;
+  }
+}
+
+/* --------------------------------------------------------------------
+   Card header + tools: allow wrapping instead of overlapping when the
+   title and action controls can't fit on one line.
+   -------------------------------------------------------------------- */
+.card-header {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+.card-header .card-title {
+  margin-bottom: 0;
+}
+.card-header .card-tools {
+  margin-left: auto;
+}
+
+/* --------------------------------------------------------------------
+   Small-box summary widgets: keep numbers legible without overflowing
+   on very small screens.
+   -------------------------------------------------------------------- */
+.small-box .icon {
+  opacity: 0.35;
+}
+@media (max-width: 400px) {
+  .small-box h3 {
+    font-size: 1.5rem;
+  }
+  .small-box .icon {
+    font-size: 3rem;
+  }
+}
+
+/* --------------------------------------------------------------------
+   Charts: fixed-height container so Chart.js (maintainAspectRatio:false)
+   scales predictably to the available width at every breakpoint,
+   instead of becoming too tall/short based on aspect ratio math.
+   -------------------------------------------------------------------- */
+.chart-card .card-body {
+  position: relative;
+}
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+}
+@media (min-width: 768px) {
+  .chart-container {
+    height: 280px;
+  }
+}
+.chart-container.chart-tall {
+  height: 260px;
+}
+@media (min-width: 768px) {
+  .chart-container.chart-tall {
+    height: 340px;
+  }
+}
+
+/* --------------------------------------------------------------------
+   Pagination: wrap instead of overflowing horizontally on phones.
+   -------------------------------------------------------------------- */
+.card-footer.pagination-footer {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+.pagination {
+  flex-wrap: wrap;
+}
+.pagination .page-link {
+  padding: 0.375rem 0.65rem;
+}
+
+/* --------------------------------------------------------------------
+   Modals: tighter padding on phones so form fields get more breathing
+   room without needing to scroll excessively.
+   -------------------------------------------------------------------- */
+@media (max-width: 575.98px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  .modal-body {
+    padding: 0.9rem;
+  }
+}
+
+/* --------------------------------------------------------------------
+   Loan detail modal stat row: 2-up on phones, 3-up from sm and above.
+   -------------------------------------------------------------------- */
+.stat-col {
+  flex: 0 0 50%;
+  max-width: 50%;
+  margin-bottom: 0.75rem;
+}
+@media (min-width: 576px) {
+  .stat-col {
+    flex: 0 0 33.3333%;
+    max-width: 33.3333%;
+    margin-bottom: 0;
+  }
+}
+
+/* --------------------------------------------------------------------
+   Touch targets: form controls and buttons stay at least ~40px tall
+   for comfortable tapping, without changing the compact desktop feel.
+   -------------------------------------------------------------------- */
+@media (max-width: 575.98px) {
+  .btn,
+  .form-control {
+    min-height: 40px;
+  }
+  .btn-sm {
+    min-height: 34px;
+  }
+  select.form-control-sm,
+  input.form-control-sm {
+    min-height: 34px;
+  }
+}
+
+/* --------------------------------------------------------------------
+   Quick-range button row (Reports page): wraps instead of overflowing
+   horizontally on phones. Plain flex buttons instead of a btn-group so
+   they can wrap onto multiple lines cleanly.
+   -------------------------------------------------------------------- */
+.quick-range-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-start;
+}
+@media (min-width: 768px) {
+  .quick-range-group {
+    justify-content: flex-end;
+  }
+}
+
+/* Sidebar user box: avoid overflow of long emails on narrow sidebars */
+.user-panel .info {
+  overflow: hidden;
+}
+.user-panel .info a,
+.user-panel .info span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Navbar username: truncate instead of pushing the dropdown off-screen
+   on narrow phones */
+#navbar-user-name {
+  display: inline-block;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+@media (min-width: 576px) {
+  #navbar-user-name {
+    max-width: 200px;
+  }
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register | Expense Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/adminlte/css/adminlte.min.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body class="hold-transition register-page">
+<div class="register-box">
+  <div class="login-logo">
+    <b><i class="fas fa-wallet mr-1"></i>Expense</b>Tracker
+  </div>
+  <div class="card">
+    <div class="card-body register-card-body">
+      <p class="login-box-msg">Create a new account</p>
+
+      <div id="alert-box" class="alert alert-danger d-none" role="alert"></div>
+
+      <form id="register-form">
+        <div class="input-group mb-3">
+          <input type="text" id="name" class="form-control" placeholder="Full name" required>
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-user"></span></div></div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="email" id="email" class="form-control" placeholder="Email" required>
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-envelope"></span></div></div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" id="phone" class="form-control" placeholder="Phone (optional)">
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-phone"></span></div></div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="password" id="password" class="form-control" placeholder="Password (min 6 characters)" required>
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-lock"></span></div></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="register-btn">
+          <span class="btn-text">Register</span>
+          <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+        </button>
+      </form>
+
+      <a href="login.html" class="text-center d-block mt-3">I already have an account</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/vendor/jquery/jquery.min.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/adminlte/js/adminlte.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/api.js"></script>
+<script>
+$(function () {
+  Auth.redirectIfLoggedIn();
+
+  $('#register-form').on('submit', function (e) {
+    e.preventDefault();
+
+    const payload = {
+      name: $('#name').val().trim(),
+      email: $('#email').val().trim(),
+      phone: $('#phone').val().trim() || null,
+      password: $('#password').val(),
+    };
+
+    const $btn = $('#register-btn');
+    $btn.prop('disabled', true);
+    $btn.find('.btn-text').addClass('d-none');
+    $btn.find('.spinner-border').removeClass('d-none');
+
+    Api.post('/api/register', payload)
+      .done(function () {
+        window.location.href = 'login.html';
+      })
+      .fail(function (resp) {
+        $('#alert-box').removeClass('d-none').text(UI.apiErrorMessage(resp));
+      })
+      .always(function () {
+        $btn.prop('disabled', false);
+        $btn.find('.btn-text').removeClass('d-none');
+        $btn.find('.spinner-border').addClass('d-none');
+      });
+  });
+});
+</script>
+</body>
+</html>

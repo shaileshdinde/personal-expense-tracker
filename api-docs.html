@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Expense Tracker API — Reference</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --ink:#10182B;
+    --ink-soft:#3B4459;
+    --ink-faint:#6B7590;
+    --paper:#FCFBF8;
+    --paper-raised:#FFFFFF;
+    --line:#E7E2D8;
+    --line-strong:#D8D1C2;
+    --stamp:#B9812E;
+    --stamp-deep:#8C611E;
+    --get:#1F8A5F; --get-bg:#EAF6F0;
+    --post:#2A5DB0; --post-bg:#EAF0FB;
+    --put:#B9812E;  --put-bg:#FAF1E2;
+    --patch:#7A4FB3;--patch-bg:#F2ECFA;
+    --delete:#B23A3A;--delete-bg:#FBEAEA;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+    --sidebar-w: 280px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    font-family:var(--sans);
+    background:var(--paper);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.6;
+  }
+  a{ color:var(--stamp-deep); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  h1,h2,h3,h4{
+    font-family:var(--sans);
+    font-weight:700;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+    margin:0 0 0.5rem;
+  }
+  code, pre, .mono{ font-family:var(--mono); }
+
+  /* ---------------- Layout shell ---------------- */
+  .shell{ display:flex; min-height:100vh; }
+
+  /* ---------------- Sidebar ---------------- */
+  .sidebar{
+    width:var(--sidebar-w);
+    flex:0 0 var(--sidebar-w);
+    background:var(--ink);
+    color:#C9CEDD;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    padding:1.5rem 1.1rem 3rem;
+  }
+  .sidebar-brand{
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+    margin-bottom:1.25rem;
+    padding-bottom:1.1rem;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+  }
+  .stamp-mark{
+    width:34px; height:34px; border-radius:50%;
+    border:2px solid var(--stamp);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:700; font-size:13px;
+    color:var(--stamp); flex:0 0 auto;
+    transform:rotate(-8deg);
+  }
+  .sidebar-brand .name{ color:#fff; font-weight:700; font-size:15px; line-height:1.25; }
+  .sidebar-brand .sub{ color:#8891A8; font-size:11.5px; text-transform:uppercase; letter-spacing:0.08em; }
+
+  .search-box{
+    width:100%;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#fff;
+    border-radius:7px;
+    padding:0.5rem 0.7rem;
+    font-size:13px;
+    margin-bottom:1.25rem;
+    font-family:var(--sans);
+  }
+  .search-box::placeholder{ color:#7C86A0; }
+  .search-box:focus{ outline:none; border-color:var(--stamp); }
+
+  .nav-group{ margin-bottom:1.1rem; }
+  .nav-group-title{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.09em;
+    color:#7C86A0;
+    padding:0.2rem 0.5rem;
+    margin-bottom:0.15rem;
+  }
+  .nav-link{
+    display:flex;
+    align-items:center;
+    gap:0.45rem;
+    padding:0.32rem 0.5rem;
+    border-radius:6px;
+    font-size:13.5px;
+    color:#C9CEDD;
+    cursor:pointer;
+  }
+  .nav-link:hover{ background:rgba(255,255,255,0.06); text-decoration:none; }
+  .nav-link.active{ background:rgba(185,129,46,0.18); color:#fff; }
+  .nav-link .m{
+    font-family:var(--mono); font-size:9.5px; font-weight:700;
+    width:38px; flex:0 0 38px; text-align:center;
+    padding:1px 0; border-radius:3px; letter-spacing:0.02em;
+  }
+  .m-get{ background:var(--get-bg); color:var(--get); }
+  .m-post{ background:var(--post-bg); color:var(--post); }
+  .m-put{ background:var(--put-bg); color:var(--put); }
+  .m-patch{ background:var(--patch-bg); color:var(--patch); }
+  .m-delete{ background:var(--delete-bg); color:var(--delete); }
+
+  /* ---------------- Main content ---------------- */
+  .main{ flex:1 1 auto; min-width:0; padding:2.5rem 3rem 6rem; max-width:900px; }
+
+  .doc-header{ margin-bottom:2rem; }
+  .doc-header .eyebrow{
+    font-family:var(--mono); font-size:12px; color:var(--stamp-deep);
+    text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;
+  }
+  .doc-header h1{ font-size:2rem; margin-bottom:0.5rem; }
+  .doc-header p{ color:var(--ink-soft); max-width:640px; }
+
+  .panel{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1.25rem 1.4rem;
+    margin-bottom:1.25rem;
+  }
+  .panel h3{ font-size:14.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); margin-bottom:0.75rem;}
+
+  .base-url-row{ display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .base-url-row input{
+    flex:1 1 260px;
+    font-family:var(--mono);
+    font-size:13.5px;
+    padding:0.5rem 0.7rem;
+    border:1px solid var(--line-strong);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .base-url-row input:focus{ outline:none; border-color:var(--stamp); }
+  .hint{ color:var(--ink-faint); font-size:12.5px; margin-top:0.5rem; }
+
+  .kv-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .kv-table th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--ink-faint); padding:0.4rem 0.6rem; border-bottom:1px solid var(--line);
+  }
+  .kv-table td{ padding:0.5rem 0.6rem; border-bottom:1px solid var(--line); vertical-align:top; }
+  .kv-table tr:last-child td{ border-bottom:none; }
+  .kv-table code{ background:#F1EEE6; padding:0.1rem 0.35rem; border-radius:4px; font-size:12.5px; }
+
+  /* ---------------- Torn-receipt divider (signature element) ---------------- */
+  .tear{
+    height:14px;
+    margin:2.5rem 0 1.5rem;
+    background:
+      radial-gradient(circle at 8px 7px, transparent 6px, var(--paper) 6.5px) repeat-x;
+    background-size:16px 14px;
+    border-top:1px dashed var(--line-strong);
+    opacity:0.9;
+  }
+  .section-heading{ display:flex; align-items:baseline; gap:0.6rem; margin-bottom:0.35rem; }
+  .section-heading h2{ font-size:1.35rem; }
+  .section-heading .count{ font-family:var(--mono); font-size:12px; color:var(--ink-faint); }
+  .section-desc{ color:var(--ink-soft); font-size:14px; margin-bottom:1.25rem; max-width:640px; }
+
+  /* ---------------- Endpoint card ---------------- */
+  .endpoint{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-bottom:1.1rem;
+    overflow:hidden;
+    scroll-margin-top:1.5rem;
+  }
+  .endpoint-head{
+    display:flex; align-items:center; gap:0.65rem;
+    padding:0.85rem 1.1rem;
+    border-bottom:1px solid var(--line);
+    background:#FAF8F3;
+    flex-wrap:wrap;
+  }
+  .method-badge{
+    font-family:var(--mono); font-weight:700; font-size:11.5px;
+    padding:0.22rem 0.55rem; border-radius:5px; letter-spacing:0.03em;
+    flex:0 0 auto;
+  }
+  .endpoint-path{ font-family:var(--mono); font-size:14px; color:var(--ink); word-break:break-all; }
+  .auth-pill{
+    margin-left:auto;
+    font-size:11px; font-family:var(--mono);
+    color:var(--ink-faint);
+    display:flex; align-items:center; gap:0.3rem;
+    padding:0.15rem 0.5rem;
+    border:1px solid var(--line-strong);
+    border-radius:20px;
+    flex:0 0 auto;
+  }
+  .auth-pill.required{ color:var(--stamp-deep); border-color:var(--stamp); }
+  .endpoint-body{ padding:1rem 1.1rem 1.2rem; }
+  .endpoint-desc{ color:var(--ink-soft); font-size:14px; margin-bottom:0.9rem; }
+
+  .subhead{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.07em;
+    color:var(--ink-faint); margin:1rem 0 0.4rem;
+  }
+  .subhead:first-child{ margin-top:0; }
+
+  .code-block{
+    position:relative;
+    background:#11182A;
+    color:#E5E9F5;
+    border-radius:8px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    line-height:1.55;
+    padding:0.85rem 1rem;
+    overflow-x:auto;
+    white-space:pre;
+  }
+  .code-block .tok-key{ color:#9FC2FF; }
+  .code-block .tok-str{ color:#A8E0B0; }
+  .code-block .tok-num{ color:#F2C879; }
+  .code-block .tok-bool{ color:#F2A0A0; }
+  .code-block .tok-comment{ color:#7C86A0; }
+
+  .copy-btn{
+    position:absolute; top:0.5rem; right:0.5rem;
+    font-family:var(--sans); font-size:11px;
+    background:rgba(255,255,255,0.08); color:#C9CEDD;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:5px; padding:0.25rem 0.55rem;
+    cursor:pointer;
+  }
+  .copy-btn:hover{ background:rgba(255,255,255,0.16); }
+  .copy-btn.copied{ color:#A8E0B0; border-color:#A8E0B0; }
+
+  .status-row{ display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.6rem; }
+  .status-chip{
+    font-family:var(--mono); font-size:11px; padding:0.15rem 0.5rem; border-radius:5px;
+    background:#F1EEE6; color:var(--ink-soft);
+  }
+  .status-chip.ok{ background:var(--get-bg); color:var(--get); }
+  .status-chip.err{ background:var(--delete-bg); color:var(--delete); }
+
+  footer.docs-footer{
+    margin-top:3rem; padding-top:1.5rem; border-top:1px solid var(--line);
+    color:var(--ink-faint); font-size:12.5px;
+  }
+
+  /* ---------------- Mobile ---------------- */
+  .mobile-topbar{ display:none; }
+  @media (max-width: 900px){
+    .shell{ flex-direction:column; }
+    .sidebar{
+      width:100%; flex:0 0 auto; height:auto; position:relative;
+      display:none;
+      padding:1rem 1rem 1.5rem;
+    }
+    .sidebar.open{ display:block; }
+    .mobile-topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:5;
+      background:var(--ink); color:#fff;
+      padding:0.8rem 1rem;
+    }
+    .mobile-topbar .name{ font-family:var(--mono); font-size:13px; }
+    .mobile-topbar button{
+      background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15);
+      border-radius:6px; padding:0.35rem 0.6rem; font-size:12px; font-family:var(--sans);
+    }
+    .main{ padding:1.5rem 1.1rem 4rem; }
+    .doc-header h1{ font-size:1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mobile-topbar">
+  <span class="name">expense-tracker · api reference</span>
+  <button id="navToggle" type="button">Menu</button>
+</div>
+
+<div class="shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="stamp-mark">₹</div>
+      <div>
+        <div class="name">Expense Tracker</div>
+        <div class="sub">API Reference</div>
+      </div>
+    </div>
+
+    <input type="search" class="search-box" id="navSearch" placeholder="Filter endpoints…">
+
+    <div id="navGroups"></div>
+  </aside>
+
+  <main class="main">
+    <div class="doc-header">
+      <div class="eyebrow">/api reference</div>
+      <h1>Expense Tracker API</h1>
+      <p>A REST API for expenses, categories, loans given to others, and reports. All endpoints
+      return JSON in the same envelope and use JWT bearer tokens for authentication.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Base URL</h3>
+      <div class="base-url-row">
+        <input type="text" id="baseUrlInput" value="http://localhost:8000" spellcheck="false">
+      </div>
+      <p class="hint">This is the folder that contains <code class="mono">index.php</code> / <code class="mono">.htaccess</code> on your server (e.g. your API's <code class="mono">public/</code> directory). Every example on this page updates automatically as you change it — try it.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Authentication</h3>
+      <p style="margin:0 0 0.6rem;">Every endpoint except <code class="mono">register</code>, <code class="mono">login</code>, <code class="mono">forgot-password</code> and <code class="mono">reset-password</code> requires a bearer token, obtained from <code class="mono">POST /api/login</code>:</p>
+      <div class="code-block">Authorization: Bearer &lt;token&gt;</div>
+      <p class="hint">Token lifetime depends on the <code class="mono">device</code> field sent at login: <strong>web</strong> → 1 hour, <strong>mobile</strong> → 30 days. Calling <code class="mono">POST /api/logout</code> revokes the current token immediately, even though JWTs are otherwise stateless.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Response envelope</h3>
+      <p style="margin:0 0 0.6rem;">Every response — success or failure — follows the same shape:</p>
+      <div class="code-block" data-json='{
+  "success": true,
+  "message": "Human-readable summary",
+  "data": { "...": "..." }
+}'></div>
+      <p class="hint" style="margin-top:0.9rem;">On validation failures (<code class="mono">422</code>), <code class="mono">data</code> is replaced by an <code class="mono">errors</code> object keyed by field name.</p>
+    </div>
+
+    <div id="sections"></div>
+
+    <footer class="docs-footer">
+      Generated reference for the Expense Tracker PHP/MySQL API. Amounts are in ₹ by default — this only affects display in the companion frontend, not the API itself, which is currency-agnostic.
+    </footer>
+  </main>
+</div>
+
+<script>
+/* ======================================================================
+   Endpoint data — one source of truth, rendered into nav + content below.
+   Kept in sync with public/index.php's router.
+   ====================================================================== */
+const PAYMENT_MODES = "cash | card | upi | netbanking | wallet | other";
+
+const sections = [
+  {
+    id: "auth",
+    title: "Auth",
+    desc: "Registration, login, logout, and password recovery.",
+    endpoints: [
+      {
+        method: "POST", path: "/api/register", auth: false,
+        desc: "Create a new account.",
+        body: { name: "Jane Doe", email: "jane@example.com", password: "secret123", phone: "9999999999" },
+        statuses: [["201", "ok", "Created"], ["409", "err", "Email already registered"], ["422", "err", "Validation failed"]],
+        response: { success: true, message: "Registration successful", data: { user_id: 1, name: "Jane Doe", email: "jane@example.com" } }
+      },
+      {
+        method: "POST", path: "/api/login", auth: false,
+        desc: "Sign in and receive a JWT. `device` must be `web` or `mobile` and controls the token's lifetime.",
+        body: { email: "jane@example.com", password: "secret123", device: "web" },
+        statuses: [["200", "ok", "OK"], ["401", "err", "Invalid credentials"], ["403", "err", "Account disabled"]],
+        response: { success: true, message: "Login successful", data: {
+          user: { id: 1, name: "Jane Doe", email: "jane@example.com", phone: "9999999999" },
+          auth: { token: "eyJhbGciOiJIUzI1NiJ9...", token_type: "Bearer", device: "web", expires_in: 3600, expires_at: "2026-08-09 20:00:00" }
+        }}
+      },
+      {
+        method: "POST", path: "/api/logout", auth: true,
+        desc: "Revoke the current token server-side. No request body.",
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "Logged out successfully", data: null }
+      },
+      {
+        method: "POST", path: "/api/forgot-password", auth: false,
+        desc: "Request a password reset token. Always responds with success (doesn't reveal whether the email is registered); the token is emailed, or logged to storage/mail.log in local dev.",
+        body: { email: "jane@example.com" },
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "If that email is registered, a reset link has been sent", data: null }
+      },
+      {
+        method: "POST", path: "/api/reset-password", auth: false,
+        desc: "Complete a password reset using the token from the forgot-password email. Token is valid for 30 minutes.",
+        body: { email: "jane@example.com", token: "raw-token-from-email", new_password: "newpass456" },
+        statuses: [["200", "ok", "OK"], ["400", "err", "Invalid or expired token"]],
+        response: { success: true, message: "Password has been reset successfully. Please login again.", data: null }
+      }
+    ]
+  },
+  {
+    id: "profile",
+    title: "Profile",
+    desc: "View and update the signed-in user's own account.",
+    endpoints: [
+      {
+        method: "GET", path: "/api/profile", auth: true,
+        desc: "Get the current user's profile.",
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: { id: 1, name: "Jane Doe", email: "jane@example.com", phone: "9999999999", status: "active", created_at: "2026-01-10 09:00:00" } }
+      },
+      {
+        method: "PUT", path: "/api/profile", auth: true,
+        desc: "Update name / phone, and optionally change password. `current_password` is required whenever `password` is supplied.",
+        body: { name: "Jane D.", phone: "8888888888", current_password: "old", password: "newpass456" },
+        statuses: [["200", "ok", "OK"], ["422", "err", "Current password incorrect / validation failed"]],
+        response: { success: true, message: "Profile updated successfully", data: { id: 1, name: "Jane D.", email: "jane@example.com", phone: "8888888888" } }
+      }
+    ]
+  },
+  {
+    id: "categories",
+    title: "Categories",
+    desc: "Top-level expense categories, scoped to the signed-in user.",
+    endpoints: [
+      {
+        method: "GET", path: "/api/categories", auth: true,
+        desc: "List categories.",
+        query: [["status", "active | disabled", "Filter by status. Omit for all."]],
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: [{ id: 1, name: "Food", status: "active", created_at: "2026-01-10 09:00:00", updated_at: "2026-01-10 09:00:00" }] }
+      },
+      {
+        method: "POST", path: "/api/categories", auth: true,
+        desc: "Create a category.",
+        body: { name: "Food" },
+        statuses: [["201", "ok", "Created"], ["409", "err", "Category already exists"]],
+        response: { success: true, message: "Category created", data: { id: 1, name: "Food" } }
+      },
+      {
+        method: "PUT", path: "/api/categories/{id}", auth: true,
+        desc: "Rename a category.",
+        body: { name: "Food & Dining" },
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Category updated", data: { id: 1, name: "Food & Dining" } }
+      },
+      {
+        method: "PATCH", path: "/api/categories/{id}/disable", auth: true,
+        desc: "Enable or disable a category. Disabling cascades to its sub-categories. `status` defaults to `disabled` if omitted.",
+        body: { status: "disabled" },
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Category status updated", data: { id: 1, status: "disabled" } }
+      }
+    ]
+  },
+  {
+    id: "subcategories",
+    title: "Sub-Categories",
+    desc: "Second-level classification, each belonging to one category.",
+    endpoints: [
+      {
+        method: "GET", path: "/api/subcategories", auth: true,
+        desc: "List sub-categories.",
+        query: [["category_id", "int", "Filter by parent category."], ["status", "active | disabled", "Filter by status."]],
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: [{ id: 1, category_id: 1, name: "Groceries", status: "active" }] }
+      },
+      {
+        method: "POST", path: "/api/subcategories", auth: true,
+        desc: "Create a sub-category under a category you own.",
+        body: { category_id: 1, name: "Groceries" },
+        statuses: [["201", "ok", "Created"], ["409", "err", "Already exists under this category"]],
+        response: { success: true, message: "Sub-category created", data: { id: 1, category_id: 1, name: "Groceries" } }
+      },
+      {
+        method: "PUT", path: "/api/subcategories/{id}", auth: true,
+        desc: "Rename a sub-category, optionally moving it to a different category.",
+        body: { name: "Supermarket", category_id: 1 },
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Sub-category updated", data: { id: 1, name: "Supermarket", category_id: 1 } }
+      },
+      {
+        method: "PATCH", path: "/api/subcategories/{id}/disable", auth: true,
+        desc: "Enable or disable a sub-category. `status` defaults to `disabled` if omitted.",
+        body: { status: "disabled" },
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Sub-category status updated", data: { id: 1, status: "disabled" } }
+      }
+    ]
+  },
+  {
+    id: "expenses",
+    title: "Expenses",
+    desc: "The individual spend records — category, sub-category, amount, date/time, payment mode.",
+    endpoints: [
+      {
+        method: "GET", path: "/api/expenses", auth: true,
+        desc: "List expenses, paginated.",
+        query: [
+          ["status", "active | disabled", "Filter by status."],
+          ["category_id", "int", "Filter by category."],
+          ["subcategory_id", "int", "Filter by sub-category."],
+          ["from / to", "YYYY-MM-DD", "Filter by expense_date range (inclusive)."],
+          ["page", "int", "Default 1."],
+          ["per_page", "int", "Default 20, max 100."]
+        ],
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: {
+          items: [{ id: 1, category_id: 1, subcategory_id: 1, category_name: "Food", subcategory_name: "Groceries",
+            reason: "Weekly groceries", details: "Bought veggies and fruits", amount: "45.50",
+            expense_date: "2026-08-01", expense_time: "18:30:00", payment_mode: "upi", remark: "Paid via GPay", status: "active" }],
+          pagination: { total: 1, page: 1, per_page: 20, pages: 1 }
+        }}
+      },
+      {
+        method: "GET", path: "/api/expenses/{id}", auth: true,
+        desc: "Get a single expense.",
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "OK", data: { id: 1, category_id: 1, reason: "Weekly groceries", amount: "45.50", expense_date: "2026-08-01", payment_mode: "upi", status: "active" } }
+      },
+      {
+        method: "POST", path: "/api/expenses", auth: true,
+        desc: "Create an expense.",
+        body: { category_id: 1, subcategory_id: 1, reason: "Weekly groceries", details: "Bought veggies and fruits", amount: 45.50, date: "2026-08-01", time: "18:30", payment_mode: "upi", remark: "Paid via GPay" },
+        note: "payment_mode ∈ " + PAYMENT_MODES + ". subcategory_id, details, remark are optional; time defaults to now if omitted.",
+        statuses: [["201", "ok", "Created"], ["422", "err", "Validation failed"]],
+        response: { success: true, message: "Expense created", data: { id: 1, category_id: 1, reason: "Weekly groceries", amount: "45.50", status: "active" } }
+      },
+      {
+        method: "PUT", path: "/api/expenses/{id}", auth: true,
+        desc: "Update an expense. Same fields as create; all optional (partial update).",
+        body: { amount: 50.00, remark: "Updated remark" },
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Expense updated", data: { id: 1, amount: "50.00", remark: "Updated remark" } }
+      },
+      {
+        method: "PATCH", path: "/api/expenses/{id}/disable", auth: true,
+        desc: "Enable or disable an expense. `status` defaults to `disabled` if omitted.",
+        body: { status: "disabled" },
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Expense status updated", data: { id: 1, status: "disabled" } }
+      }
+    ]
+  },
+  {
+    id: "reports",
+    title: "Reports",
+    desc: "Aggregated views over expenses — by category, sub-category, date range, and month.",
+    endpoints: [
+      {
+        method: "GET", path: "/api/reports/by-category", auth: true,
+        desc: "Totals grouped by category.",
+        query: [["from / to", "YYYY-MM-DD", "Optional date range filter."], ["status", "active | disabled | all", "Defaults to active."]],
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: [{ category_id: 1, category_name: "Food", expense_count: 4, total_amount: "182.50" }] }
+      },
+      {
+        method: "GET", path: "/api/reports/by-subcategory", auth: true,
+        desc: "Totals grouped by sub-category.",
+        query: [["category_id", "int", "Optional, restrict to one category."], ["from / to", "YYYY-MM-DD", "Optional date range filter."]],
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: [{ subcategory_id: 1, subcategory_name: "Groceries", category_id: 1, category_name: "Food", expense_count: 3, total_amount: "140.00" }] }
+      },
+      {
+        method: "GET", path: "/api/reports/by-date-range", auth: true,
+        desc: "Daily breakdown between two dates (inclusive). `from` and `to` are required.",
+        query: [["from", "YYYY-MM-DD", "Required."], ["to", "YYYY-MM-DD", "Required."]],
+        statuses: [["200", "ok", "OK"], ["422", "err", "Missing from/to"]],
+        response: { success: true, message: "OK", data: {
+          from: "2026-08-01", to: "2026-08-07",
+          daily: [{ expense_date: "2026-08-01", expense_count: 2, total_amount: "60.00" }],
+          grand_total: 60.00
+        }}
+      },
+      {
+        method: "GET", path: "/api/reports/monthly", auth: true,
+        desc: "Monthly summary. With only `year`: month-by-month totals for that year. With `year` and `month`: that month's total plus a category breakdown.",
+        query: [["year", "int", "Defaults to current year."], ["month", "1–12", "Optional."]],
+        statuses: [["200", "ok", "OK"], ["422", "err", "month out of range"]],
+        response: { success: true, message: "OK", data: {
+          year: 2026, month: 8, expense_count: 12, total_amount: "540.00",
+          by_category: [{ category_id: 1, category_name: "Food", expense_count: 5, total_amount: "220.00" }]
+        }}
+      }
+    ]
+  },
+  {
+    id: "loans",
+    title: "Loans Given",
+    desc: "Money you lend to other people, with partial repayment tracking. A loan auto-closes once repayments cover the full amount.",
+    endpoints: [
+      {
+        method: "GET", path: "/api/loans", auth: true,
+        desc: "List loans, paginated. Each item includes computed `total_repaid` and `balance`.",
+        query: [
+          ["status", "active | closed | disabled", "Filter by status."],
+          ["search", "string", "Filter by borrower name (partial match)."],
+          ["from / to", "YYYY-MM-DD", "Filter by loan_date range."],
+          ["page / per_page", "int", "Pagination, default 1 / 20."]
+        ],
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: {
+          items: [{ id: 1, borrower_name: "Rahul Sharma", borrower_contact: "9876543210", amount: "5000.00", loan_date: "2026-07-01", due_date: "2026-09-01", status: "active", total_repaid: 2000, balance: 3000 }],
+          pagination: { total: 1, page: 1, per_page: 20, pages: 1 }
+        }}
+      },
+      {
+        method: "GET", path: "/api/loans/summary", auth: true,
+        desc: "Aggregate totals for dashboard widgets — excludes disabled loans.",
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: { loan_count: 5, active_count: 3, closed_count: 2, total_lent: 25000, total_repaid: 18000, total_outstanding: 7000 } }
+      },
+      {
+        method: "GET", path: "/api/loans/{id}", auth: true,
+        desc: "Get a single loan, including its full repayment history.",
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "OK", data: {
+          id: 1, borrower_name: "Rahul Sharma", amount: "5000.00", status: "active", total_repaid: 2000, balance: 3000,
+          repayments: [{ id: 1, amount: "2000.00", payment_date: "2026-07-20", payment_mode: "upi", remark: "First installment" }]
+        }}
+      },
+      {
+        method: "POST", path: "/api/loans", auth: true,
+        desc: "Record a new loan.",
+        body: { borrower_name: "Rahul Sharma", borrower_contact: "9876543210", amount: 5000, loan_date: "2026-08-01", due_date: "2026-10-01", interest_rate: 2.5, reason: "Medical emergency", remark: "Friend from college" },
+        note: "interest_rate is optional and informational only — it is not applied to the balance calculation.",
+        statuses: [["201", "ok", "Created"], ["422", "err", "Validation failed"]],
+        response: { success: true, message: "Loan recorded", data: { id: 1, borrower_name: "Rahul Sharma", amount: "5000.00", status: "active", total_repaid: 0, balance: 5000 } }
+      },
+      {
+        method: "PUT", path: "/api/loans/{id}", auth: true,
+        desc: "Update a loan's details. Partial update.",
+        body: { due_date: "2026-11-01", remark: "Extended by a month" },
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Loan updated", data: { id: 1, due_date: "2026-11-01", remark: "Extended by a month" } }
+      },
+      {
+        method: "PATCH", path: "/api/loans/{id}/status", auth: true,
+        desc: "Manually set status. Use to void a mistaken entry (disabled) or reopen one.",
+        body: { status: "disabled" },
+        note: "status ∈ active | closed | disabled.",
+        statuses: [["200", "ok", "OK"], ["422", "err", "Invalid status"]],
+        response: { success: true, message: "Loan status updated", data: { id: 1, status: "disabled" } }
+      },
+      {
+        method: "POST", path: "/api/loans/{id}/repayments", auth: true,
+        desc: "Record a repayment. Automatically marks the loan closed once total repayments reach the loan amount.",
+        body: { amount: 2000, payment_date: "2026-08-15", payment_mode: "upi", remark: "First installment" },
+        note: "payment_mode ∈ " + PAYMENT_MODES + ".",
+        statuses: [["201", "ok", "Created"], ["422", "err", "Loan is disabled / validation failed"]],
+        response: { success: true, message: "Repayment recorded", data: { id: 1, total_repaid: 2000, balance: 3000, status: "active" } }
+      },
+      {
+        method: "DELETE", path: "/api/loans/{id}/repayments/{repaymentId}", auth: true,
+        desc: "Remove a mistaken repayment entry. Re-opens the loan to active if the balance becomes positive again.",
+        statuses: [["200", "ok", "OK"], ["404", "err", "Repayment not found"]],
+        response: { success: true, message: "Repayment removed", data: { id: 1, total_repaid: 0, balance: 5000, status: "active" } }
+      }
+    ]
+  }
+];
+
+/* ======================================================================
+   Rendering
+   ====================================================================== */
+function esc(s){
+  return String(s).replace(/[&<>]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" }[c]));
+}
+
+function syntaxHighlight(json){
+  let s = esc(json);
+  s = s.replace(/"([^"]+)":/g, '<span class="tok-key">"$1"</span>:');
+  s = s.replace(/: "([^"]*)"/g, ': <span class="tok-str">"$1"</span>');
+  s = s.replace(/: (-?\d+(\.\d+)?)/g, ': <span class="tok-num">$1</span>');
+  s = s.replace(/: (true|false|null)/g, ': <span class="tok-bool">$1</span>');
+  return s;
+}
+
+function codeBlock(text, isJson){
+  const id = "cb" + Math.random().toString(36).slice(2, 9);
+  const html = isJson ? syntaxHighlight(text) : esc(text);
+  return `<div class="code-block" id="${id}">${html}<button class="copy-btn" onclick="copyBlock('${id}', this)">Copy</button></div>`;
+}
+
+function slugify(sectionId, method, path){
+  const pathSlug = path.replace(/[\/{}]/g, "-").replace(/^-+|-+$/g, "");
+  return sectionId + "-" + method.toLowerCase() + "-" + pathSlug;
+}
+
+function endpointCard(ep, sectionId){
+  const anchor = slugify(sectionId, ep.method, ep.path);
+  const mCls = "m-" + ep.method.toLowerCase();
+
+  let html = `<div class="endpoint" id="${anchor}">`;
+  html += `<div class="endpoint-head">`;
+  html += `<span class="method-badge ${mCls}" style="background:var(--${ep.method.toLowerCase()}-bg, #eee); color:var(--${ep.method.toLowerCase()})">${ep.method}</span>`;
+  html += `<span class="endpoint-path">${esc(ep.path)}</span>`;
+  html += `<span class="auth-pill ${ep.auth ? "required" : ""}">${ep.auth ? "🔒 auth required" : "public"}</span>`;
+  html += `</div>`;
+  html += `<div class="endpoint-body">`;
+  html += `<p class="endpoint-desc">${ep.desc}</p>`;
+
+  if (ep.note){
+    html += `<p class="hint" style="margin-bottom:0.9rem;">${ep.note}</p>`;
+  }
+
+  if (ep.query && ep.query.length){
+    html += `<div class="subhead">Query parameters</div>`;
+    html += `<table class="kv-table"><thead><tr><th>Param</th><th>Type</th><th>Notes</th></tr></thead><tbody>`;
+    ep.query.forEach(([k,t,n]) => {
+      html += `<tr><td><code>${esc(k)}</code></td><td>${esc(t)}</td><td>${esc(n)}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+
+  if (ep.body){
+    html += `<div class="subhead">Request body</div>`;
+    html += codeBlock(JSON.stringify(ep.body, null, 2), true);
+  }
+
+  if (ep.statuses && ep.statuses.length){
+    html += `<div class="subhead">Status codes</div>`;
+    html += `<div class="status-row">`;
+    ep.statuses.forEach(([code, kind, label]) => {
+      html += `<span class="status-chip ${kind}">${code} · ${esc(label)}</span>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div class="subhead">Example response</div>`;
+  html += codeBlock(JSON.stringify(ep.response, null, 2), true);
+
+  html += `<div class="subhead">cURL</div>`;
+  html += `<div class="code-block curl-block" data-method="${ep.method}" data-path="${esc(ep.path)}" data-body='${ep.body ? esc(JSON.stringify(ep.body)) : ""}'></div>`;
+
+  html += `</div></div>`;
+  return { html, anchor };
+}
+
+function render(){
+  const navGroups = document.getElementById("navGroups");
+  const sectionsEl = document.getElementById("sections");
+  navGroups.innerHTML = "";
+  sectionsEl.innerHTML = "";
+
+  sections.forEach(sec => {
+    const group = document.createElement("div");
+    group.className = "nav-group";
+    group.innerHTML = `<div class="nav-group-title">${esc(sec.title)}</div>`;
+    sec.endpoints.forEach(ep => {
+      const anchor = slugify(sec.id, ep.method, ep.path);
+      const a = document.createElement("a");
+      a.className = "nav-link";
+      a.href = "#" + anchor;
+      a.dataset.search = (ep.method + " " + ep.path + " " + ep.desc).toLowerCase();
+      a.innerHTML = `<span class="m m-${ep.method.toLowerCase()}">${ep.method}</span><span>${esc(ep.path)}</span>`;
+      group.appendChild(a);
+    });
+    navGroups.appendChild(group);
+
+    const wrap = document.createElement("div");
+    wrap.innerHTML = `
+      <div class="tear"></div>
+      <div class="section-heading" id="${sec.id}">
+        <h2>${esc(sec.title)}</h2>
+        <span class="count">${sec.endpoints.length} endpoint${sec.endpoints.length > 1 ? "s" : ""}</span>
+      </div>
+      <p class="section-desc">${esc(sec.desc)}</p>
+    `;
+    sec.endpoints.forEach(ep => {
+      const { html } = endpointCard(ep, sec.id);
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      wrap.appendChild(div.firstChild);
+    });
+    sectionsEl.appendChild(wrap);
+  });
+
+  renderCurlBlocks();
+}
+
+function renderCurlBlocks(){
+  const base = document.getElementById("baseUrlInput").value.replace(/\/$/, "") || "http://localhost:8000";
+  document.querySelectorAll(".curl-block").forEach(block => {
+    const method = block.dataset.method;
+    const path = block.dataset.path;
+    const bodyRaw = block.dataset.body;
+    const body = bodyRaw ? JSON.parse(bodyRaw) : null;
+
+    let cmd = `curl -s -X ${method} "${base}${path}"`;
+    cmd += ` \\\n  -H "Authorization: Bearer $TOKEN"`;
+    if (body){
+      cmd += ` \\\n  -H "Content-Type: application/json"`;
+      cmd += ` \\\n  -d '${JSON.stringify(body)}'`;
+    }
+
+    const id = block.id || ("curl" + Math.random().toString(36).slice(2, 9));
+    block.id = id;
+    block.innerHTML = esc(cmd) + `<button class="copy-btn" onclick="copyBlock('${id}', this)">Copy</button>`;
+  });
+}
+
+function copyBlock(id, btn){
+  const el = document.getElementById(id);
+  const clone = el.cloneNode(true);
+  const b = clone.querySelector(".copy-btn");
+  if (b) b.remove();
+  const text = clone.textContent;
+
+  const done = () => {
+    btn.textContent = "Copied";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 1400);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(done);
+  } else {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch(e) {}
+    document.body.removeChild(ta);
+    done();
+  }
+}
+
+/* ---------------- Search filter ---------------- */
+document.getElementById("navSearch").addEventListener("input", function(){
+  const q = this.value.trim().toLowerCase();
+  document.querySelectorAll(".nav-link").forEach(a => {
+    a.style.display = !q || a.dataset.search.includes(q) ? "flex" : "none";
+  });
+  document.querySelectorAll(".nav-group").forEach(g => {
+    const visible = Array.from(g.querySelectorAll(".nav-link")).some(a => a.style.display !== "none");
+    g.style.display = visible ? "block" : "none";
+  });
+});
+
+/* ---------------- Base URL persistence + live curl updates ----------------
+   Wrapped in try/catch: localStorage throws on "opaque origin" contexts
+   (e.g. this file opened directly via file:// instead of through a server),
+   which would otherwise halt the whole script before render() runs. */
+const baseInput = document.getElementById("baseUrlInput");
+function safeGetStorage(key){
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+function safeSetStorage(key, val){
+  try { localStorage.setItem(key, val); } catch (e) { /* no persistence available, that's fine */ }
+}
+const savedBase = safeGetStorage("apiDocsBaseUrl");
+if (savedBase) baseInput.value = savedBase;
+baseInput.addEventListener("input", function(){
+  safeSetStorage("apiDocsBaseUrl", this.value);
+  renderCurlBlocks();
+});
+
+/* ---------------- Active nav highlight on scroll ---------------- */
+function setActiveNav(){
+  const links = Array.from(document.querySelectorAll(".nav-link"));
+  let current = null;
+  document.querySelectorAll(".endpoint").forEach(ep => {
+    const rect = ep.getBoundingClientRect();
+    if (rect.top < 140) current = ep.id;
+  });
+  links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + current));
+}
+window.addEventListener("scroll", setActiveNav, { passive: true });
+
+/* ---------------- Mobile nav toggle ---------------- */
+document.getElementById("navToggle").addEventListener("click", function(){
+  document.getElementById("sidebar").classList.toggle("open");
+});
+document.querySelectorAll(".sidebar").forEach(sb => {
+  sb.addEventListener("click", function(e){
+    if (e.target.closest(".nav-link") && window.innerWidth <= 900){
+      sb.classList.remove("open");
+    }
+  });
+});
+
+render();
+</script>
+</body>
+</html>
