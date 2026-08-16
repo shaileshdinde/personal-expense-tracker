@@ -74,6 +74,45 @@
 
         <div class="row">
           <div class="col-12">
+            <div id="bills-due-alert" class="alert alert-warning d-none" role="alert">
+              <i class="fas fa-bell mr-1"></i>
+              <span id="bills-due-alert-text"></span>
+              <a href="bills.html" class="alert-link ml-1">Review bills &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-file-invoice-dollar mr-1"></i> Recurring Bills</h3>
+                <div class="card-tools">
+                  <a href="bills.html" class="btn btn-sm btn-primary">Manage Bills</a>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row text-center">
+                  <div class="col-6 col-md-4">
+                    <div class="text-muted small">Pending This Month</div>
+                    <div class="h4 text-warning" id="bill-stat-pending">0</div>
+                  </div>
+                  <div class="col-6 col-md-4 mt-3 mt-md-0">
+                    <div class="text-muted small">Done This Month</div>
+                    <div class="h4 text-success" id="bill-stat-done">0</div>
+                  </div>
+                  <div class="col-12 col-md-4 mt-3 mt-md-0">
+                    <div class="text-muted small">Total Monthly Bills</div>
+                    <div class="h4" id="bill-stat-total">₹0.00</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-hand-holding-usd mr-1"></i> Loans Given</h3>

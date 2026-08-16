@@ -10,7 +10,30 @@ $(function () {
     loadTrendChart();
     loadRecentExpenses();
     loadLoanSummary();
+    loadBillsSummary();
   });
+
+  function loadBillsSummary() {
+    Api.get('/api/bills?status=active').done(function (resp) {
+      const rows = resp.data.items;
+      const pending = rows.filter(function (b) { return b.month_status === 'pending'; });
+      const done = rows.filter(function (b) { return b.month_status === 'done'; });
+      const total = rows.reduce(function (sum, b) { return sum + Number(b.amount || 0); }, 0);
+
+      $('#bill-stat-pending').text(pending.length);
+      $('#bill-stat-done').text(done.length);
+      $('#bill-stat-total').text(UI.money(total));
+
+      if (pending.length) {
+        const names = pending.slice(0, 3).map(function (b) { return b.name; }).join(', ');
+        const extra = pending.length > 3 ? ' and ' + (pending.length - 3) + ' more' : '';
+        $('#bills-due-alert-text').text(pending.length + ' bill' + (pending.length > 1 ? 's' : '') + ' due this month: ' + names + extra + '.');
+        $('#bills-due-alert').removeClass('d-none');
+      } else {
+        $('#bills-due-alert').addClass('d-none');
+      }
+    });
+  }
 
   function loadLoanSummary() {
     Api.get('/api/loans/summary').done(function (resp) {

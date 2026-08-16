@@ -598,6 +598,63 @@ const sections = [
     ]
   },
   {
+    id: "bills",
+    title: "Recurring Bills",
+    desc: "Monthly bills (rent, subscriptions, etc.) with a due day and a per-month done/pending checklist. Resets automatically each new month.",
+    endpoints: [
+      {
+        method: "GET", path: "/api/bills", auth: true,
+        desc: "List bills, each annotated with `month_status` (done/pending) for the requested year/month.",
+        query: [["status", "active | disabled", "Filter by status. Defaults to all."], ["year / month", "int", "Defaults to the current year/month."]],
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: { year: 2026, month: 8, items: [{ id: 1, name: "Rent", amount: "15000.00", day_of_month: 1, category_name: null, status: "active", month_status: "pending", completed_at: null }] } }
+      },
+      {
+        method: "GET", path: "/api/bills/due", auth: true,
+        desc: "Active bills not yet marked done this month, whose due day has arrived. Powers the app-wide notification badge shown from day 1 (or the bill's due day) onward.",
+        statuses: [["200", "ok", "OK"]],
+        response: { success: true, message: "OK", data: { year: 2026, month: 8, count: 1, items: [{ id: 1, name: "Rent", amount: "15000.00", day_of_month: 1, category_name: null }] } }
+      },
+      {
+        method: "POST", path: "/api/bills", auth: true,
+        desc: "Create a recurring bill.",
+        body: { name: "Rent", amount: 15000, category_id: null, day_of_month: 1, remark: "Monthly rent" },
+        note: "amount and category_id are optional. day_of_month must be 1-28 (capped so it's valid every month).",
+        statuses: [["201", "ok", "Created"], ["422", "err", "Validation failed"]],
+        response: { success: true, message: "Bill created", data: { id: 1, name: "Rent", amount: "15000.00", day_of_month: 1, status: "active" } }
+      },
+      {
+        method: "PUT", path: "/api/bills/{id}", auth: true,
+        desc: "Update a bill's details. Partial update.",
+        body: { amount: 15500, remark: "Rent increased" },
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Bill updated", data: { id: 1, amount: "15500.00", remark: "Rent increased" } }
+      },
+      {
+        method: "PATCH", path: "/api/bills/{id}/disable", auth: true,
+        desc: "Enable or disable a bill. `status` defaults to `disabled` if omitted.",
+        body: { status: "disabled" },
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Bill status updated", data: { id: 1, status: "disabled" } }
+      },
+      {
+        method: "POST", path: "/api/bills/{id}/complete", auth: true,
+        desc: "Mark the bill done for a given month. Idempotent - calling it again just updates the timestamp.",
+        body: { year: 2026, month: 8 },
+        note: "year/month are optional and default to the current month.",
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Marked as done", data: { id: 1, month_status: "done", completed_at: "2026-08-16 09:00:00" } }
+      },
+      {
+        method: "DELETE", path: "/api/bills/{id}/complete", auth: true,
+        desc: "Undo a \"mark done\" for a given month, reverting it to pending.",
+        query: [["year / month", "int", "Defaults to the current year/month."]],
+        statuses: [["200", "ok", "OK"], ["404", "err", "Not found"]],
+        response: { success: true, message: "Marked as pending", data: { id: 1, month_status: "pending", completed_at: null } }
+      }
+    ]
+  },
+  {
     id: "loans",
     title: "Loans Given",
     desc: "Money you lend to other people, with partial repayment tracking. A loan auto-closes once repayments cover the full amount.",

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recurring Bills | Expense Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/adminlte/css/adminlte.min.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <div id="navbar-placeholder"></div>
+  <div id="sidebar-placeholder"></div>
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2 align-items-center">
+          <div class="col-sm-6"><h1 class="m-0">Recurring Bills</h1></div>
+          <div class="col-sm-6 text-sm-right">
+            <button class="btn btn-primary btn-page-action" id="btn-new-bill">
+              <i class="fas fa-plus mr-1"></i> New Bill
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+
+        <div id="due-banner" class="alert alert-warning d-none" role="alert">
+          <i class="fas fa-bell mr-1"></i>
+          <span id="due-banner-text"></span>
+        </div>
+
+        <!-- Summary -->
+        <div class="row">
+          <div class="col-lg-4 col-6">
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3 id="stat-pending">0</h3>
+                <p>Pending This Month</p>
+              </div>
+              <div class="icon"><i class="fas fa-hourglass-half"></i></div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-6">
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3 id="stat-done">0</h3>
+                <p>Done This Month</p>
+              </div>
+              <div class="icon"><i class="fas fa-check-circle"></i></div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-12">
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3 id="stat-total-amount">₹0.00</h3>
+                <p>Total Monthly Bills</p>
+              </div>
+              <div class="icon"><i class="fas fa-file-invoice-dollar"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="btn-group btn-group-sm flex-wrap" role="group" id="status-filter">
+              <button type="button" class="btn btn-outline-secondary active" data-status="active">Active</button>
+              <button type="button" class="btn btn-outline-secondary" data-status="disabled">Disabled</button>
+              <button type="button" class="btn btn-outline-secondary" data-status="">All</button>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Bill</th>
+                  <th>Category</th>
+                  <th>Due Day</th>
+                  <th class="text-right">Amount</th>
+                  <th>This Month</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bills-body">
+                <tr><td colspan="6" class="text-center py-4 text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <div id="footer-placeholder"></div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal fade" id="bill-modal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="bill-form">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bill-modal-title">New Bill</h5>
+          <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="bill_id">
+          <div class="form-row">
+            <div class="form-group col-12 col-md-7">
+              <label>Bill Name <span class="required-asterisk">*</span></label>
+              <input type="text" class="form-control" id="bill_name" required maxlength="150" placeholder="e.g. Rent, Netflix, Electricity">
+            </div>
+            <div class="form-group col-6 col-md-5">
+              <label>Amount <span class="text-muted small">(optional)</span></label>
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">₹</span></div>
+                <input type="number" step="0.01" min="0" class="form-control" id="bill_amount">
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-6 col-md-4">
+              <label>Due Day of Month <span class="required-asterisk">*</span></label>
+              <input type="number" min="1" max="28" class="form-control" id="bill_day_of_month" value="1" required>
+              <small class="text-muted">1-28 (to stay valid every month)</small>
+            </div>
+            <div class="form-group col-6 col-md-8">
+              <label>Category <span class="text-muted small">(optional)</span></label>
+              <select class="form-control" id="bill_category_id">
+                <option value="">None</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Remark</label>
+            <input type="text" class="form-control" id="bill_remark" maxlength="255">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="assets/vendor/jquery/jquery.min.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/adminlte/js/adminlte.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/bills.js"></script>
+</body>
+</html>

@@ -160,6 +160,47 @@ CREATE TABLE `users` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `recurring_bills`
+--
+
+CREATE TABLE IF NOT EXISTS recurring_bills (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    amount DECIMAL(12,2) DEFAULT NULL COMMENT 'Optional - not all bills have a fixed known amount',
+    category_id INT UNSIGNED DEFAULT NULL,
+    day_of_month TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1-28, the day each month the bill becomes due',
+    remark VARCHAR(255) DEFAULT NULL,
+    status ENUM('active','disabled') NOT NULL DEFAULT 'active',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+    INDEX idx_user_status (user_id, status)
+) ENGINE=InnoDB;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bill_completions`
+--
+
+CREATE TABLE IF NOT EXISTS bill_completions (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    bill_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    year SMALLINT UNSIGNED NOT NULL,
+    month TINYINT UNSIGNED NOT NULL,
+    completed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (bill_id) REFERENCES recurring_bills(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY uniq_bill_month (bill_id, year, month)
+) ENGINE=InnoDB;
+
+
 --
 -- Indexes for dumped tables
 --

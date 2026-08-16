@@ -5,6 +5,11 @@
  *   "http://localhost:8000"
  *   "https://api.yourdomain.com"
  */
+const basePath = window.location.href.substring(
+  0,
+  window.location.href.lastIndexOf("/") + 1
+);
+
 window.APP_CONFIG = {
-  API_BASE_URL: "http://localhost/svl/personal-expense-tracker/api/public/",
+  API_BASE_URL: basePath + "api/public/"
 };

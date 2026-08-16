@@ -16,6 +16,7 @@ require_once __DIR__ . '/../controllers/SubcategoryController.php';
 require_once __DIR__ . '/../controllers/ExpenseController.php';
 require_once __DIR__ . '/../controllers/ReportController.php';
 require_once __DIR__ . '/../controllers/LoanController.php';
+require_once __DIR__ . '/../controllers/BillController.php';
 
 // CORS (adjust origins for production)
 header('Access-Control-Allow-Origin: *');
@@ -157,6 +158,22 @@ try {
         LoanController::addRepayment(authUserId(), (int) $p['id'], $input);
     } elseif (($p = matchRoute('/api/loans/{id}/repayments/{repaymentId}', $uri)) && $method === 'DELETE') {
         LoanController::deleteRepayment(authUserId(), (int) $p['id'], (int) $p['repaymentId']);
+
+    // ---- Recurring Bills ----
+    } elseif ($uri === '/api/bills' && $method === 'GET') {
+        BillController::index(authUserId(), $query);
+    } elseif ($uri === '/api/bills' && $method === 'POST') {
+        BillController::store(authUserId(), $input);
+    } elseif ($uri === '/api/bills/due' && $method === 'GET') {
+        BillController::due(authUserId());
+    } elseif (($p = matchRoute('/api/bills/{id}', $uri)) && $method === 'PUT') {
+        BillController::update(authUserId(), (int) $p['id'], $input);
+    } elseif (($p = matchRoute('/api/bills/{id}/disable', $uri)) && $method === 'PATCH') {
+        BillController::toggleStatus(authUserId(), (int) $p['id'], $input ?: ['status' => 'disabled']);
+    } elseif (($p = matchRoute('/api/bills/{id}/complete', $uri)) && $method === 'POST') {
+        BillController::complete(authUserId(), (int) $p['id'], $input);
+    } elseif (($p = matchRoute('/api/bills/{id}/complete', $uri)) && $method === 'DELETE') {
+        BillController::uncomplete(authUserId(), (int) $p['id'], $query);
 
     } else {
         Response::error('Route not found', 404);
