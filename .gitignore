@@ -1,7 +1,7 @@
 # CakePHP 3
 
 /vendor/*
-/config/app.php
+*/config/app.php
 
 /tmp/cache/models/*
 !/tmp/cache/models/empty
@@ -26,3 +26,4 @@
 
 .env
 
+api/config/config.php
