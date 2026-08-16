@@ -9,7 +9,7 @@ all bundled locally in `assets/vendor/` (no CDN required, works offline).
 
 ## 1. Point it at your API
 
-Open `assets/js/config.js` and set your backend URL:
+Open `assets/js/config.js?v=1.0.1` and set your backend URL:
 
 ```js
 window.APP_CONFIG = {
